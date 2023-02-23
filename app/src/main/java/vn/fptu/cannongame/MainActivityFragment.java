@@ -10,35 +10,44 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class MainActivityFragment extends Fragment {
+    private CannonView cannonView; // custom view to display the game
 
-    private CannonView cannonView;
-
+    // called when Fragment's view needs to be created
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        View view=inflater.inflate(R.layout.fragment_main, container, false);
+        // inflate the fragment_main.xml layout
+        View view =
+                inflater.inflate(R.layout.fragment_main, container, false);
 
-        cannonView=(CannonView) view.findViewById(R.id.cannonView);
+        // get a reference to the CannonView
+        cannonView = (CannonView) view.findViewById(R.id.cannonView);
+        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
         return view;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState){
-        super.onActivityCreated(savedInstanceState);
+    // set up volume control once Activity is created
+//    @Override
+//    public void onViewCreated(Bundle savedInstanceState) {
+//        super.onViewCreated(savedInstanceState);
+//
+//        // allow volume buttons to set game volume
+//        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
+//    }
 
-        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
-    }
-
+    // when MainActivity is paused, terminate the game
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
-        cannonView.stopGame();
+        cannonView.stopGame(); // terminates the game
     }
 
+    // when MainActivity is paused, MainActivityFragment releases resources
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         cannonView.releaseResources();
     }
