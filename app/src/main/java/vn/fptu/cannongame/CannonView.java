@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -308,43 +307,23 @@ public class CannonView extends SurfaceView
 //    }
 
     private void showGameOverDialog(final int messageId) {
-        // DialogFragment to display game stats and start new game
-        final DialogFragment gameResult =
-                new DialogFragment() {
-                    // create an AlertDialog and return it
-                    @Override
-                    public Dialog onCreateDialog(Bundle bundle) {
-                        // create dialog displaying String resource for messageId
-                        AlertDialog.Builder builder =
-                                new AlertDialog.Builder(getActivity());
-                        builder.setTitle(getResources().getString(messageId));
+        AlertDialog.Builder gameResult = new AlertDialog.Builder(getContext())
+                .setTitle(getResources().getString(messageId))
+                .setMessage(getResources().getString(
+                        R.string.results_format, shotsFired, totalElapsedTime))
+                .setPositiveButton(R.string.reset_game, (dialog, which) -> {
+                    dialogIsDisplayed = false;
+                    newGame(); // set up and start a new game
+                });
 
-                        // display number of shots fired and total time elapsed
-                        builder.setMessage(getResources().getString(
-                                R.string.results_format, shotsFired, totalElapsedTime));
-                        builder.setPositiveButton(R.string.reset_game,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialogIsDisplayed = false;
-                                        newGame();
-                                    }
-                                }
-                        );
-
-                        return builder.create(); // return the AlertDialog
-                    }
-                };
 
         // in GUI thread, use FragmentManager to display the DialogFragment
         activity.runOnUiThread(
-                new Runnable() {
-                    public void run() {
-                        showSystemBars();
-                        dialogIsDisplayed = true;
-                        gameResult.setCancelable(false); // modal dialog
-//                        gameResult.show(activity.getFragmentManager(), "results");
-                    }
+                () -> {
+                    showSystemBars();
+                    dialogIsDisplayed = true;
+                    gameResult.setCancelable(false); // modal dialog
+                    gameResult.show();
                 }
         );
     }
